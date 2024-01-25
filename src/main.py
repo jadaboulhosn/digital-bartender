@@ -144,7 +144,7 @@ class App(customtkinter.CTk):
         self.tool_panel.grid(row=1, column=0, sticky="nsew")
 
         # Configure the board and pumps
-        GPIO.setmode(GPIO.BOARD)
+        GPIO.setmode(GPIO.BCM)
         for pump in self.settings.pumps:
             GPIO.setup(pump.addr, GPIO.OUT)
 
