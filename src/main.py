@@ -63,7 +63,7 @@ class App(customtkinter.CTk):
         super().__init__()
 
         self.settings = Settings()
-        self.updater = Updater()
+        self.updater = Updater(self)
 
         if Cookbook.instance().get_type_count() == 0:
             vodka = Type("Vodka")

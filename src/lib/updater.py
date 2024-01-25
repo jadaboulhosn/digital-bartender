@@ -3,9 +3,10 @@ import shlex
 import asyncio
 
 class Updater:
-    def __init__(self):
+    def __init__(self, app):
         self.task = asyncio.Task(self.check_for_updates())
         self.ready = True
+        self.app = app
         pass
 
     def set_update_readiness(self, state):
@@ -26,6 +27,8 @@ class Updater:
 
                 cmds = shlex.split("python3 ../main.py")
                 subprocess.Popen(cmds, start_new_session=True)
+
+                self.app.settings.save_settings()
 
                 exit()
             asyncio.sleep(1)
