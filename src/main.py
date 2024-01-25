@@ -116,7 +116,7 @@ class App(customtkinter.CTk):
 
         # Enter kiosk mode for the bartender system
         if sys.platform == "linux" or sys.platform == "linux2":
-            if subprocess.check_output("uname -n") == "bartender":
+            if subprocess.check_output(["uname", "-n"]) == "bartender":
                 self.overrideredirect(True)
 
         # Configure the weights of the rows
@@ -495,7 +495,7 @@ if __name__ == "__main__":
     
     if sys.platform == "linux" or sys.platform == "linux2":
         os.environ["DISPLAY"] = ':0' 
-        
+
     customtkinter.set_appearance_mode('dark')
     app = App()
     app.mainloop()

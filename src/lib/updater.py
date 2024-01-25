@@ -1,5 +1,4 @@
 import subprocess
-import shlex
 import asyncio
 
 class Updater:
@@ -25,8 +24,7 @@ class Updater:
                 print("Update downloaded... restarting!")
                 self.task.cancel()
 
-                cmds = shlex.split("python3 ../main.py")
-                subprocess.Popen(cmds, start_new_session=True)
+                subprocess.Popen(["python3", "../main.py"], start_new_session=True)
 
                 self.app.settings.save_settings()
 
