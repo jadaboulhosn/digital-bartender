@@ -143,6 +143,11 @@ class App(customtkinter.CTk):
         self.tool_panel = customtkinter.CTkFrame(self)
         self.tool_panel.grid(row=1, column=0, sticky="nsew")
 
+        # Configure the board and pumps
+        GPIO.setmode(GPIO.BOARD)
+        for pump in self.settings.pumps:
+            GPIO.setup(pump.addr, GPIO.OUT)
+
         # Add buttons to the lower panel with stretching horizontally
         self.btn_settings = customtkinter.CTkButton(self.tool_panel, text="Settings", font=self.button_font, command=self.settings_clicked, corner_radius=0, width=self.settings.width * 0.30)
         self.btn_settings.pack(side="left", fill="y")
@@ -442,12 +447,6 @@ class App(customtkinter.CTk):
         self.updater.set_update_readiness(False)
 
         seconds = float(mls) / float(self.settings.milliliters_per_second)
-
-        try:
-            GPIO.setmode(GPIO.BOARD)
-            GPIO.setup(pump.addr, GPIO.OUT)
-        except:
-            pass
 
         print("Pouring from " + pump.name + " " + str(mls) + " mL (" + str(seconds) + ") seconds.")
 
