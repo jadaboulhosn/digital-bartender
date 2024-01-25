@@ -492,7 +492,10 @@ def copy_config_template():
 
 if __name__ == "__main__":
     initialize()
-
+    
+    if sys.platform == "linux" or sys.platform == "linux2":
+        os.environ["DISPLAY"] = ':0' 
+        
     customtkinter.set_appearance_mode('dark')
     app = App()
     app.mainloop()
