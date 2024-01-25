@@ -6,6 +6,7 @@ import customtkinter
 import jsonpickle
 import time
 import threading
+import subprocess
 
 sys.path.append("./lib")
 from database import Database
@@ -15,6 +16,7 @@ from step import Step
 from beverage import Beverage
 from recipe import Recipe
 from components import OnScreenKeyboard, CustomPanel
+from updater import Updater
 
 if sys.platform == "linux" or sys.platform == "linux2":
     import RPi.GPIO as GPIO
@@ -61,6 +63,7 @@ class App(customtkinter.CTk):
         super().__init__()
 
         self.settings = Settings()
+        self.updater = Updater()
 
         if Cookbook.instance().get_type_count() == 0:
             vodka = Type("Vodka")
@@ -105,8 +108,16 @@ class App(customtkinter.CTk):
             tequila_oj.add_step(Step(oj, 200))
 
 
-        self.geometry(f"{self.settings.width}x{self.settings.height}")
-        #self.overrideredirect(True)
+        screen_width = self.winfo_screenwidth()
+        screen_height = self.winfo_screenheight()
+        x = (screen_width / 2) - (self.settings.width / 2)
+        y = (screen_height / 2) - (self.settings.height / 2)
+        self.geometry('%dx%d+%d+%d' % (self.settings.width, self.settings.height, x, y))
+
+        # Enter kiosk mode for the bartender system
+        if sys.platform == "linux" or sys.platform == "linux2":
+            if subprocess.check_output("uname -n") == "bartender":
+                self.overrideredirect(True)
 
         # Configure the weights of the rows
         self.grid_columnconfigure(0, weight=1)  # Horizontal space
@@ -377,6 +388,8 @@ class App(customtkinter.CTk):
             self.setup_abort_action(pump)
 
     def setup_purge_action(self, pump):
+        self.updater.set_update_readiness(False)
+
         self.run_pump(pump)
 
         self.maintenance_buttons[pump]['purge'].pack_forget()
@@ -399,6 +412,7 @@ class App(customtkinter.CTk):
                 break
 
         if not is_aborting:
+            self.updater.set_update_readiness(True)
             self.enable_menu()
 
     def setup_set_beverage(self, event, value, key):
@@ -425,6 +439,8 @@ class App(customtkinter.CTk):
         self.settings_panel.grid_columnconfigure(2, weight=1)
 
     def do_tap(self, pump: Pump, mls: int):
+        self.updater.set_update_readiness(False)
+
         seconds = float(mls) / float(self.settings.milliliters_per_second)
 
         try:
@@ -447,6 +463,8 @@ class App(customtkinter.CTk):
         self.progressbar.set(percent)
         if percent > 0.99:
             self.main_abort()
+        
+        self.updater.set_update_readiness(True)
 
     def run_pump(self, pump):
         GPIO.output(pump.addr, GPIO.HIGH)
