@@ -116,8 +116,12 @@ class App(customtkinter.CTk):
 
         # Enter kiosk mode for the bartender system
         if sys.platform == "linux" or sys.platform == "linux2":
-            if subprocess.check_output(["uname", "-n"]) == "bartender":
+            host = subprocess.check_output(["uname", "-n"])
+            print("Detected valid host (" + host + "). Enabling production mode.")
+            if host == "bartender":
                 self.overrideredirect(True)
+        else:
+            print("Non-production host is detected. Enabling dev mode.")
 
         # Configure the weights of the rows
         self.grid_columnconfigure(0, weight=1)  # Horizontal space
