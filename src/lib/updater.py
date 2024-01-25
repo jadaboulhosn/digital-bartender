@@ -17,7 +17,7 @@ class Updater:
 
     async def check_for_updates(self):
         while True:
-            if "up to date" not in subprocess.check_output(['git', 'status']) and self.ready:
+            if "up to date" not in str(subprocess.check_output(['git', 'status'])) and self.ready:
                 print("Update was detected in git. Retreiving...")
                 subprocess.check_output(['git', 'pull'])
                 
