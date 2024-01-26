@@ -116,12 +116,12 @@ class App(customtkinter.CTk):
 
         # Enter kiosk mode for the bartender system
         if sys.platform == "linux" or sys.platform == "linux2":
-            host = subprocess.check_output(["uname", "-n"]).decode("utf-8")
+            host = subprocess.check_output(["uname", "-n"]).decode("utf-8").replace("\n", "").strip()
             if host == "bartender":
                 print("Detected valid host (" + host + "). Enabling production mode.")
                 self.overrideredirect(True)
             else:
-                print("Invalid hostname is detected. Hostname should be bartender to enable production mode. Enabling dev mode.")
+                print("Invalid hostname (" + host + ") is detected. Hostname should be bartender to enable production mode. Enabling dev mode.")
         else:
             print("Non-production host is detected. Enabling dev mode.")
 
