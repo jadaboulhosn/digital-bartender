@@ -65,6 +65,8 @@ class App(customtkinter.CTk):
         self.settings = Settings()
         self.updater = Updater(self)
 
+        self.withdraw()
+
         if Cookbook.instance().get_type_count() == 0:
             vodka = Type("Vodka")
             Cookbook.instance().add_type(vodka)    
@@ -172,6 +174,8 @@ class App(customtkinter.CTk):
         self.setup_setup_panel()
 
         self.bartender_clicked()
+
+        self.deiconify()
 
     def bind_keyboard(self, widget):
         widget.bind("<Button-1>", self.show_keyboard)
