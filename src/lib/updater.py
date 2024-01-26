@@ -9,7 +9,7 @@ class Updater:
         pass
 
     def set_update_readiness(self, state):
-        prev_state = self.state
+        prev_state = self.ready
         self.ready = state
         if prev_state != state:
             if state:
