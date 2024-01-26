@@ -31,4 +31,5 @@ class Updater:
                 self.app.settings.save_settings()
 
                 exit()
+            print("No updates.")
             asyncio.sleep(1)
