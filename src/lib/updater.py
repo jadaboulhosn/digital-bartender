@@ -9,11 +9,13 @@ class Updater:
         pass
 
     def set_update_readiness(self, state):
+        prev_state = self.state
         self.ready = state
-        if state:
-            print("Updates are now enabled.")
-        else:
-            print("Updates are now disabled.")
+        if prev_state != state:
+            if state:
+                print("Updates are now enabled.")
+            else:
+                print("Updates are now disabled.")
 
     async def check_for_updates(self):
         while True:
