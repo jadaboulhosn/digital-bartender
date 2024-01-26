@@ -120,6 +120,7 @@ class App(customtkinter.CTk):
             print("Detected valid host (" + str(host) + "). Enabling production mode.")
             if str(host) == "bartender":
                 self.overrideredirect(True)
+                self.wm_attributes('-fullscreen', 'True')
         else:
             print("Non-production host is detected. Enabling dev mode.")
 
