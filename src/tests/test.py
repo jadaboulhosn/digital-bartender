@@ -1,6 +1,7 @@
 import sys
 sys.path.insert(0, './')
 
+import logging
 import unittest
 
 from backend.bar import Entity, Type, Beverage, Step, Recipe
@@ -418,4 +419,7 @@ class TestDatabase(unittest.TestCase):
         rec.clear()
         dev.clear()
 
+logging.basicConfig()
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 unittest.main()

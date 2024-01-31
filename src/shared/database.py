@@ -43,7 +43,6 @@ class Database(object):
                             for step in ser_rec.steps:
                                 relinked_beverage = False
                                 for ser_bev in Beverages.instance():
-                                    logging.info(f"{ser_bev} hash {hash(ser_bev)} -> hash {hash(step.beverage)}")
                                     if hash(step.beverage) == hash(ser_bev):
                                         logging.info(f"\tRelinking Beverage: {ser_bev}")
                                         step.beverage = ser_bev

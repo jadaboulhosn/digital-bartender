@@ -3,28 +3,40 @@ import customtkinter as ctk
 from frontend.components import ToggleButton
 
 class ToolbarFrame(ctk.CTkFrame):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, windows: list, state_changed, default: int = 0, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
-        self.grid_rowconfigure(0, weight = 1)
-        self.grid_columnconfigure(0, weight = 1)
-        self.grid_columnconfigure(1, weight = 1)
-        self.grid_columnconfigure(2, weight = 1)
+        self.grid_rowconfigure(0, weight=1)
 
-        self.btn_setup = ToggleButton(master = self, command = self.btn_setup_click, text = "Setup")
-        self.btn_setup.grid(row = 0, column = 0, sticky="nsew")
+        def state_click(target_window):
+            for window, button in self.buttons.items():
+                if target_window != window:
+                    button.untoggle()
+            self.window = target_window
+            state_changed(self.window)
 
-        self.btn_main = ToggleButton(master = self, command = self.btn_main_click, text = "Bartender")
-        self.btn_main.grid(row = 0, column = 1, sticky="nsew")
+        self.buttons = {}    
+        self.windows = windows
+        for i in range(0, len(self.windows)):
+            window = self.windows[i]
+            self.grid_columnconfigure(i, weight=1)
 
-        self.btn_recipes = ToggleButton(master = self, command = self.btn_recipes_click, text = "Recipes")
-        self.btn_recipes.grid(row = 0, column = 2, sticky="nsew")
+            self.buttons[window] = ToggleButton(
+                master=self, 
+                command=lambda window=window: state_click(window), 
+                text=window.name
+                )
+            self.buttons[window].grid(row=0, column=i, sticky="nsew")
 
-    def btn_main_click(self):
-        pass
+        self.buttons[self.windows[default]].invoke()
 
-    def btn_setup_click(self):
-        pass
+    def enable(self):
+        for _, button in self.buttons.items():
+            button.enable()
 
-    def btn_recipes_click(self):
-        pass
+    def disable(self):
+        for _, button in self.buttons.items():
+            button.disable()
+
+    def get_state(self) -> str:
+        return self.window
