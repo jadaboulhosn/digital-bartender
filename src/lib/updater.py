@@ -6,7 +6,6 @@ class Updater:
         self.task = asyncio.Task(self.check_for_updates())
         self.ready = True
         self.app = app
-        pass
 
     def set_update_readiness(self, state):
         prev_state = self.ready
@@ -31,5 +30,4 @@ class Updater:
                 self.app.settings.save_settings()
 
                 exit()
-            print("No updates.")
             asyncio.sleep(1)
