@@ -307,8 +307,8 @@ class TestSystem(unittest.TestCase):
         self.assertTrue(p_one.is_valid(), "Valid pump was marked invalid!")
 
         # Test functions.
-        self.assertTrue(p_one.activate(), "Unable to activate a valid pump!")
         self.assertFalse(p_one.deactivate(), "Inactive pump was deactivated!")
+        self.assertTrue(p_one.activate(), "Unable to activate a valid pump!")
         self.assertTrue(p_one.is_active(), "Pump was not active despite being activated!")
         self.assertTrue(p_one.deactivate(), "Unable to deactivate a valid pump!")
 
