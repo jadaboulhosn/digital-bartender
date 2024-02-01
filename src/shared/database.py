@@ -98,9 +98,7 @@ class Database(object):
                     with open(datum.path, 'w') as file:
                         self.last_write[datum.path] = data
                         file.write(data)
-                        logging.info(f"Successfully wrote {len(datum.reference.data)} objects to {datum.path}.")
-                else:
-                    print("Skipping write for " + datum.path)
+                        logging.info(f"Detected change. Writing {len(datum.reference.data)} objects to {datum.path}.")
             return True
         except Exception as e:
             logging.critical("Unable to write archival data:\n\t{e}")
