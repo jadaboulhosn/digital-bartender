@@ -304,7 +304,7 @@ class TestSystem(unittest.TestCase):
         dev.clear()
 
         # Create fake valid Pump.
-        p_one = dev.attach("Test Pump 1", 29)
+        p_one = dev.attach("Test Pump 1", 33, 31)
         self.assertTrue(p_one.is_valid(), "Valid pump was marked invalid!")
 
         # Test functions.
@@ -314,7 +314,7 @@ class TestSystem(unittest.TestCase):
         self.assertTrue(p_one.deactivate(), "Unable to deactivate a valid pump!")
 
         # Create fake invalid Pump.
-        p_two = dev.attach("Test Pump 2", 1)
+        p_two = dev.attach("Test Pump 2", 1, 2)
         self.assertFalse(p_two.is_valid(), "Invalid pump was marked valid!")
 
         # Test functions.
@@ -368,11 +368,11 @@ class TestDatabase(unittest.TestCase):
         database = Database("../data/test/")
 
         # Create fake valid Pump.
-        p_one = dev.attach("Test Pump 1", 29)
+        p_one = dev.attach("Test Pump 1", 33, 31)
         self.assertTrue(p_one.is_valid(), "Valid pump was marked invalid!")
 
         # Create fake invalid Pump.
-        p_two = dev.attach("Test Pump 2", 1)
+        p_two = dev.attach("Test Pump 2", 1, 2)
         self.assertFalse(p_two.is_valid(), "Invalid pump was marked valid!")
 
         # Collect Serialization IDs.

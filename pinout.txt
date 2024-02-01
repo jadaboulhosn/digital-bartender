@@ -1,0 +1,39 @@
+Pump 1:
+    VCC:    IN1     BROWN   GPIO13  33      
+    GND:    IN2     RED     GPIO6   31
+    OUT:    GPIO13  HIGH    
+            GPIO6   LOW
+    IN:     GPIO6   HIGH    
+            GPIO13  LOW 
+
+Pump 2: 
+    VCC:    IN3     ORANGE  GPIO5   29
+    GND:    IN2     RED     GPIO6   31
+    OUT:    GPIO5   HIGH    
+            GPIO6   LOW
+    IN:     GPIO6   HIGH    
+            GPIO5   LOW     
+
+PUMP 3:
+    VCC:    IN3     ORANGE  GPIO5   29           
+    GND:    IN6     YELLOW  GPIO22  15
+    OUT:    GPIO5   HIGH    
+            GPIO22  LOW
+    IN:     GPIO22  HIGH    
+            GPIO5   LOW
+
+PUMP 4:
+    VCC:    IN7     GREEN   GPIO27  13
+    GND:    IN6     YELLOW  GPIO22  15
+    OUT:    GPIO27  HIGH    
+            GPIO22  LOW
+    IN:     GPIO22  HIGH   
+            GPIO27  LOW
+            
+PUMP 5:
+    VCC:    IN7     GREEN   GPIO27  13
+    GND:    IN8     BLUE    GPIO17  11
+    OUT:    GPIO27  HIGH    
+            GPIO17 LOW
+    IN:     GPIO17  HIGH    
+            GPIO27 LOW

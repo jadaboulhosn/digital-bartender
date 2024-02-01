@@ -29,6 +29,9 @@ class Step(Entity):
 
         super().__init__()
 
+    def set_volume(self, volume: int):
+        self.volume = volume
+
     def __str__(self) -> str:
         return str(self.beverage) + " [" + str(self.volume) + " mL]"
 
@@ -61,8 +64,10 @@ class Recipe(Entity):
         return volume
     
     def __str__(self) -> str:
-        desc = f"{self.name} ("
-        for step in self.steps:
-            desc += f"{str(step)}, "
-        desc = desc[0:len(desc) - 2] + ")"
+        desc = f"{self.name}"
+        if (len(self.steps) > 0):
+            desc += " ("
+            for step in self.steps:
+                desc += f"{str(step)}, "
+            desc = desc[0:len(desc) - 2] + ")"
         return desc 

@@ -4,7 +4,7 @@ sys.path.insert(0, './')
 import customtkinter as ctk
 import logging
 
-from frontend.toolbar import ToolbarFrame
+from frontend.components import ToolbarFrame
 from frontend.windows.input import InputFrame
 from frontend.settings import Settings
 from frontend.fonts import Fonts
@@ -13,7 +13,7 @@ from frontend.windows.bartender import BartenderFrame
 from frontend.windows.recipes import RecipesFrame
 from frontend.windows.setup import SetupFrame
 
-from shared.singleton import Singleton
+from shared.database import Database
 
 from backend.util import get_hostname
 
@@ -23,6 +23,9 @@ class App(ctk.CTk):
         #self.withdraw()
     
         self.register_fonts()
+        self.database = Database()
+        self.database.load()
+        self.save()
 
         screen_width = self.winfo_screenwidth()
         screen_height = self.winfo_screenheight()
@@ -31,8 +34,8 @@ class App(ctk.CTk):
         self.geometry('%dx%d+%d+%d' % (Settings.instance().width, Settings.instance().height, x, y))
         self.minsize(Settings.instance().width, Settings.instance().height)
 
-        self.rowconfigure(0, weight=85)
-        self.rowconfigure(1, weight=15)
+        self.rowconfigure(0, weight=8)
+        self.rowconfigure(1, weight=2)
         self.columnconfigure(0, weight=1)
 
         self.resizable(False, False)
@@ -58,34 +61,51 @@ class App(ctk.CTk):
         self.keyboard.grid(row=0, column=0, rowspan=2, sticky='nsew')
         self.hide_keyboard()
 
+        self.numberpad = InputFrame(master=self, fg_color=self._fg_color, numeric_only=True)
+        self.numberpad.grid(row=0, column=0, rowspan=2, sticky='nsew')
+        self.hide_keyboard(use_numeric=True)
+
         self.wm_title("digitender")
         #self.deiconify()
 
-    def show_keyboard(self, on_submit, on_cancel, text=""):
+    def save(self):
+        self.database.save()
+        self.after(5000, self.save)
+
+    def show_keyboard(self, on_submit, on_cancel, text="", use_numeric=False):
         for window in self.windows:
             window.grid_remove()
         
         self.toolbar.grid_remove()
 
-        self.keyboard.grid()
-
-        self.keyboard.setup(
-            lambda text: [self.hide_keyboard(), on_submit(text)], 
-            lambda: [self.hide_keyboard(), on_cancel()],
+        keyboard = self.keyboard
+        if use_numeric:
+            keyboard = self.numberpad
+            
+        keyboard.grid()
+        keyboard.setup(
+            lambda text: [self.hide_keyboard(use_numeric), on_submit(text)], 
+            lambda: [self.hide_keyboard(use_numeric), on_cancel()],
             text
             )
-    
-    def hide_keyboard(self):
+        
+    def hide_keyboard(self, use_numeric=False):
         for window in self.windows:
             window.grid()
         
         self.toolbar.grid()
 
-        self.keyboard.grid_remove()
+        keyboard = self.keyboard
+        if use_numeric:
+            keyboard = self.numberpad
+            
+        keyboard.grid_remove()
 
     def register_fonts(self):
-        Fonts.instance().add("button", ctk.CTkFont(family="Stencil Std", size=30, weight="bold"))
-        Fonts.instance().add("textfield", ctk.CTkFont(family="Stencil Std", size=24, weight="bold"))
+        Fonts.instance().add("button", ctk.CTkFont(family="Stencil Std", size=32, weight="bold"))
+        Fonts.instance().add("textfield", ctk.CTkFont(family="Stencil Std", size=26, weight="bold"))
+        Fonts.instance().add("title", ctk.CTkFont(family="Stencil Std", size=24, weight="bold"))
+        Fonts.instance().add("body", ctk.CTkFont(family="Stencil Std", size=18))
         
     def toolbar_changed(self, window):
         window.tkraise()

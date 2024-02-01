@@ -13,10 +13,17 @@ class Types():
         self.data = []
 
     def append(self, type: 'Type'):
-        self.data.append(type)
-        
         logging.info(f"Adding {type} to Types.")
-    
+        self.data.append(type)
+
+    def check_references(self, type: 'Type') -> bool:
+        if type in self.data:
+            for beverage in Beverages.instance():
+                if beverage.type == type:
+                    return True
+
+        return False
+
     def remove(self, type: 'Type') -> bool:
         logging.info(f"Removing {type} from Types.")
         if type in self.data:
@@ -72,9 +79,16 @@ class Beverages():
         self.data = []
 
     def append(self, beverage: 'Beverage'):
+        logging.info(f"Adding {beverage} to Beverages.")
         self.data.append(beverage)
 
-        logging.info(f"Adding {beverage} to Beverages.")
+    def check_references(self, beverage: 'Beverage') -> bool:
+        if beverage in self.data:
+            for recipe in Recipes.instance():
+                if recipe.contains(beverage):
+                    return True
+        
+        return False
 
     def remove(self, beverage: 'Beverage') -> bool:
         logging.info(f"Removing {beverage} from Beverages.")

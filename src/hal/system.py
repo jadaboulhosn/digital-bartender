@@ -8,11 +8,11 @@ class System():
     def __init__(self):
         self.data = []
     
-    def attach(self, name: str, pin_number: int) -> Pump:
-        pump = Pump(name, pin_number)
-        self.data.append(pump)
-
+    def attach(self, name: str, vcc_pin: int, gnd_pin: int) -> Pump:
+        pump = Pump(name, vcc_pin, gnd_pin)
+        
         logging.info(f"Adding {pump} to System.")
+        self.data.append(pump)
         return pump
 
     def disconnect(self, pump: 'Pump') -> bool:

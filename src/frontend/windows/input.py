@@ -1,16 +1,17 @@
 import customtkinter as ctk
 
-from frontend.components import Button, ToggleButton
+from frontend.components import Button, ToggleToolbarButton
 from frontend.fonts import Fonts
 import frontend.colors as Colors
 
 class InputFrame(ctk.CTkFrame):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, numeric_only=False, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.caps_lock = False
         self.shift = False
         self.on_submit = None
         self.on_cancel = None
+        self.numeric_only = numeric_only
 
         self.configure(fg_color=Colors.BUTTON_GRAY)
 
@@ -21,12 +22,12 @@ class InputFrame(ctk.CTkFrame):
         
         # Define the keyboard layout
         self.keys = [
-            ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'],
-            ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
-            [self.caps_lock_key, 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
-            [self.shift_key, 'z', 'x', 'c', 'v', 'b', 'n', 'm', self.backspace_key],
-            ['Space']
-        ]
+                ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'],
+                ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
+                [self.caps_lock_key, 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
+                [self.shift_key, 'z', 'x', 'c', 'v', 'b', 'n', 'm', self.backspace_key],
+                ['Space']
+            ]
 
         self.buttons = {}
      
@@ -40,7 +41,7 @@ class InputFrame(ctk.CTkFrame):
 
                 btn = None
                 if key == self.shift_key or key == self.caps_lock_key:
-                    btn = ToggleButton(
+                    btn = ToggleToolbarButton(
                         master=self, 
                         text=key, 
                         command=fn,
@@ -54,6 +55,14 @@ class InputFrame(ctk.CTkFrame):
                         fg_color=Colors.BUTTON_GRAY
                         )
                 
+                if numeric_only and not key.isdigit():
+                    btn.configure(True, state="disabled")
+                else:
+                    btn.configure(True, state="enabled")
+
+                if key == self.backspace_key:
+                    btn.configure(True, state="enabled")
+
                 self.buttons[key] = btn
 
                 if key == 'Space':
@@ -78,9 +87,17 @@ class InputFrame(ctk.CTkFrame):
             master=self, 
             text="Done", 
             fg_color=Colors.BUTTON_GREEN,
-            command=lambda: self.on_submit(self.text.get(1.0, "end-1c"))
+            command=self.on_submitted
             )
         self.btn_submit.grid(row=0, column=8, columnspan=2, sticky='nsew')
+
+    def on_submitted(self):
+        text = self.text.get(1.0, "end-1c")
+        if self.numeric_only and len(text) == 0:
+            self.on_submit('0')
+            return
+        
+        self.on_submit(text)
 
     def on_key_press(self, key):
         # Handle key presses

@@ -26,8 +26,12 @@ class Database(object):
             Storage(Recipes.instance(), self.path + "recipes.json"),
             Storage(System.instance(), self.path + "system.json")
         ]
-
+ 
     def load(self):
+        if self.path == None:
+            logging.error("Attempted to load from database before initialization!")
+            return
+        
         try:
             for datum in self.archive:
                 if isfile(datum.path):
@@ -73,6 +77,10 @@ class Database(object):
             return False
     
     def save(self):
+        if self.path == None:
+            logging.error("Attempted to save to database before initialization!")
+            return
+        
         try:
             for datum in self.archive:
                 with open(datum.path, 'w') as file:
@@ -85,4 +93,8 @@ class Database(object):
             return False
         
     def destroy(self):
+        if self.path == None:
+            logging.error("Attempted to destroy database before initialization!")
+            return
+        
         shutil.rmtree(self.path)
