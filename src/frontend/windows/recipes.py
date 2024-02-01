@@ -26,7 +26,8 @@ class RecipesFrame(WindowFrame):
             master = self, 
             text = "←", 
             command = self.btn_left_clicked, 
-            fg_color = Colors.BUTTON_GRAY
+            fg_color = Colors.BUTTON_GRAY,
+            corner_radius=8
             )
         self.btn_left.grid(row=1, column=0, sticky='w')
         self.btn_left.configure(True, width=128, height=128)
@@ -35,7 +36,8 @@ class RecipesFrame(WindowFrame):
             master = self, 
             text = "→", 
             command = self.btn_right_clicked, 
-            fg_color = Colors.BUTTON_GRAY
+            fg_color = Colors.BUTTON_GRAY,
+            corner_radius=8
             )
         self.btn_right.grid(row=1, column=2, sticky='e')
         self.btn_right.configure(True, width=128, height=128)
@@ -290,7 +292,7 @@ class RecipeFrame(ctk.CTkFrame):
 
     def btn_add_clicked(self):
         self.master.master.show_keyboard(
-            lambda text: [Recipes.instance().append(Recipe(text)), self.load()],
+            lambda text: [Recipes.instance().append(Recipe(text)), self.load(), self.master.on_recipe_selected(Recipes.instance()[len(Recipes.instance())-1]), self.master.show_recipe_editor()],
             lambda: logging.info("No Recipe added due to user cancellation.")
             )
         
