@@ -26,6 +26,8 @@ class Database(object):
             Storage(Recipes.instance(), self.path + "recipes.json"),
             Storage(System.instance(), self.path + "system.json")
         ]
+        
+        self.last_write = {}
  
     def load(self):
         if self.path == None:
@@ -83,10 +85,22 @@ class Database(object):
         
         try:
             for datum in self.archive:
-                with open(datum.path, 'w') as file:
-                    file.write(jsonpickle.encode(datum.reference.data))
-                logging.info(f"Successfully wrote {len(datum.reference.data)} objects to {datum.path}.")
+                data = jsonpickle.encode(datum.reference.data)
 
+                needs_write = False
+                if datum.path not in self.last_write:
+                    needs_write = True
+
+                if datum.path in self.last_write and self.last_write[datum.path] != data:
+                    needs_write = True
+
+                if needs_write:
+                    with open(datum.path, 'w') as file:
+                        self.last_write[datum.path] = data
+                        file.write(data)
+                        logging.info(f"Successfully wrote {len(datum.reference.data)} objects to {datum.path}.")
+                else:
+                    print("Skipping write for " + datum.path)
             return True
         except Exception as e:
             logging.critical("Unable to write archival data:\n\t{e}")
