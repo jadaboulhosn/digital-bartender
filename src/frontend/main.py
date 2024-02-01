@@ -74,7 +74,7 @@ class App(ctk.CTk):
 
     def save(self):
         self.database.save()
-        self.after(5000, self.save)
+        self.after(500, self.save)
 
     def show_popup(self, title: str, message: str, on_okay = None, on_cancel = None):
         self.popup.show(title, message, on_okay, on_cancel)
