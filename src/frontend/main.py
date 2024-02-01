@@ -4,7 +4,7 @@ sys.path.insert(0, './')
 import customtkinter as ctk
 import logging
 
-from frontend.components import ToolbarFrame
+from frontend.components import ToolbarFrame, PopupFrame
 from frontend.windows.input import InputFrame
 from frontend.settings import Settings
 from frontend.fonts import Fonts
@@ -52,10 +52,14 @@ class App(ctk.CTk):
         self.toolbar = ToolbarFrame(
             windows=self.windows, 
             state_changed=self.toolbar_changed, 
-            default=2, 
+            default=1, 
             master=self
             )
         self.toolbar.grid(row=1, column=0, sticky='nsew', pady=(0, 0))
+
+        self.popup = PopupFrame(master=self)
+        self.popup.grid(row=0, column=0, rowspan=2, columnspan=1, sticky='nsew')
+        self.popup.grid_remove()
 
         self.keyboard = InputFrame(master=self, fg_color=self._fg_color)
         self.keyboard.grid(row=0, column=0, rowspan=2, sticky='nsew')
@@ -72,10 +76,24 @@ class App(ctk.CTk):
         self.database.save()
         self.after(5000, self.save)
 
+    def show_popup(self, title: str, message: str, on_okay = None, on_cancel = None):
+        self.popup.show(title, message, on_okay, on_cancel)
+        self.popup.grid()
+        
+        for window in self.windows:
+            window.grid_remove()
+        self.toolbar.grid_remove()
+
+    def hide_popup(self):
+        self.popup.grid_remove()
+
+        for window in self.windows:
+            window.grid()
+        self.toolbar.grid()
+
     def show_keyboard(self, on_submit, on_cancel, text="", use_numeric=False):
         for window in self.windows:
             window.grid_remove()
-        
         self.toolbar.grid_remove()
 
         keyboard = self.keyboard

@@ -3,45 +3,58 @@ import frontend.colors as Colors
 from frontend.fonts import Fonts
 import customtkinter as ctk
 
+from frontend.settings import Settings
+
+class PopupFrame(ctk.CTkFrame):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)  
+
+        self.columnconfigure(0, weight=1)
+        self.rowconfigure(0, weight=1)
+        self.rowconfigure(1, weight=0)
+        self.rowconfigure(2, weight=0)
+        self.rowconfigure(3, weight=0)
+        self.rowconfigure(4, weight=1)
+        
+        self.title = None
+        self.label = None
+        self.okay_cancel = None
+        
+    def show(self, title: str, message: str, on_okay = None, on_cancel = None):
+        if self.title is not None:
+            self.title.destroy()
+        self.title = ctk.CTkLabel(self, text=title, font=Fonts.instance().get("title"), fg_color=self._fg_color)
+        self.title.grid(row=1, column=0, pady=(0, 16))
+    
+        if self.label is not None:
+            self.label.destroy()
+        self.label = ctk.CTkLabel(self, text=message, font=Fonts.instance().get("body"), fg_color=self._fg_color)
+        self.label.grid(row=2, column=0, pady=(0, 8))
+
+        if self.okay_cancel is not None:
+            self.okay_cancel.destroy()
+        self.okay_cancel = OkayCancelGroup(
+            on_okay=lambda: [self.master.hide_popup(), on_okay()], 
+            on_cancel=lambda: [self.master.hide_popup(), on_cancel()], 
+            master=self,
+            fg_color=self._fg_color
+            )
+        self.okay_cancel.grid(row=3, column=0)
+
 class OkayCancelGroup(ctk.CTkFrame):
     def __init__(self, on_okay, on_cancel = None, **kwargs):
         super().__init__(**kwargs)  
 
         self.rowconfigure(0, weight=0)
         self.columnconfigure(0, weight=1)
-        self.okay_button = Button(master=self, command=on_okay, text="Okay")
+
+        self.okay_button = Button(master=self, command=on_okay, text="Okay", fg_color=Colors.BUTTON_GRAY)
+        self.okay_button.grid(row=0, column=0, sticky='ew')
 
         if on_cancel is not None:
             self.columnconfigure(1, weight=1)
-            self.cancel_button = Button(master=self, command=on_cancel, text="Nevermind")
-
-class Popup(ctk.CTk):
-    def __init__(self, title: str, message: str, on_okay = None, on_cancel = None):
-        super().__init__()
-        self.wm_title(title)
-        self.resizable(width=False, height=False)
-
-        self.overrideredirect(True)
-
-        self.rowconfigure(0, weight=1)
-        self.rowconfigure(1, weight=1)
-        self.rowconfigure(2, weight=0)
-
-        self.title = ctk.CTkLabel(self, text=title, font=Fonts.instance().title)
-        self.title.grid(row=0, column=0, sticky='nsew')
-    
-        self.label = ctk.CTkLabel(self, text=message, font=Fonts.instance().body)
-        self.label.grid(row=1, column=0, sticky='nsew')
-
-        self.okay_cancel = OkayCancelGroup(
-            on_okay=lambda: [self.destroy(), on_okay()], 
-            on_cancel=lambda: [self.destroy(), on_cancel()], 
-            master=self
-            )
-        self.okay_cancel.grid(row=2, column=0, sticky='ew')
-
-        logging.info(f"Showing popup - Title: {title}, Message: {message}")
-        self.mainloop()
+            self.cancel_button = Button(master=self, command=on_cancel, text="Cancel", fg_color=Colors.BUTTON_GRAY)
+            self.cancel_button.grid(row=0, column=1, sticky='ew')
 
 class Button(ctk.CTkButton):
     def __init__(self, **kwargs):

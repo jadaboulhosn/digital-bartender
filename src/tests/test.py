@@ -173,6 +173,7 @@ class TestTypes(unittest.TestCase):
         rec.append(rec_b)
 
         # Test 1: Remove a base Type.
+        self.assertTrue(typ.check_references(type_a), "Failed to detect downstream references.")
         self.assertTrue(typ.remove(type_a), "Failed to remove a Type with downstream references.")
         self.assertEqual(len(typ), 2, "More Types remaining than expected!")
 
@@ -240,6 +241,7 @@ class TestBeverages(unittest.TestCase):
         rec.append(rec_b)
 
         # Test 1: Remove a base Beverage.
+        self.assertTrue(bev.check_references(bev_a), "Failed to detect downstream references.")
         self.assertTrue(bev.remove(bev_a), "Failed to remove a Type with downstream references.")
         self.assertEqual(len(bev), 3, "More Types remaining than expected!")
 

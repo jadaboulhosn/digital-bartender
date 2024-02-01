@@ -3,7 +3,7 @@ import customtkinter as ctk
 import logging
 
 import frontend.colors as Colors
-from frontend.components import Button, ToggleListButton, UpDownFrame, AddEditDeleteFrame, ScrollableFrame, Popup, CloseHeader
+from frontend.components import Button, ToggleListButton, UpDownFrame, AddEditDeleteFrame, ScrollableFrame, CloseHeader
 from frontend.fonts import Fonts
 from frontend.windows.window import WindowFrame
 
@@ -148,11 +148,11 @@ class TypeFrame(ctk.CTkFrame):
     def btn_delete_clicked(self):
         if self.scrollview.selected_obj is not None:
             if Types.instance().check_references(self.scrollview.selected_obj):
-                Popup(
-                    "Beverage Warning", 
-                    "Beverage that reference this type will be deleted!", 
-                    lambda: [Types.instance().remove(self.scrollview.selected_obj), self.load()],
-                    lambda: logging.info("User aborted type removal due to recipe collision.")
+                self.master.master.show_popup(
+                    title="Warning", 
+                    message="The beverage type you are trying to delete is used by other beverages and recipes.\nYou can still delete this type, but this will automatically delete associated beverages and recipes.\nDo you still want to proceed?", 
+                    on_okay=lambda: [Types.instance().remove(self.scrollview.selected_obj), self.load()],
+                    on_cancel=lambda: logging.info("User aborted type removal due to recipe collision.")
                 )
             else:
                 Types.instance().remove(self.scrollview.selected_obj)
@@ -216,11 +216,12 @@ class BeverageFrame(ctk.CTkFrame):
     def btn_delete_clicked(self):
         if self.scrollview.selected_obj is not None:
             if Beverages.instance().check_references(self.scrollview.selected_obj):
-                Popup(
-                    "Recipe Warning", 
-                    "Recipes that reference this beverage will be deleted!", 
-                    lambda: [Beverages.instance().remove(self.scrollview.selected_obj), self.load()],
-                    lambda: logging.info("User aborted beverage removal due to recipe collision.")
+                self.master.master.show_popup(
+                    title="Warning", 
+                    message="The beverage you are trying to delete is used by other recipes.\nYou can still delete this beverage, but this will automatically delete any associated recipes.\nDo you still want to proceed?", 
+                    on_okay=lambda: [Beverages.instance().remove(self.scrollview.selected_obj), self.load()],
+                    on_cancel=lambda: logging.info("User aborted beverage removal due to recipe collision."
+                    )
                 ) 
             else:
                 Beverages.instance().remove(self.scrollview.selected_obj)
@@ -393,7 +394,6 @@ class RecipeEditorFrame(ctk.CTkFrame):
 
     def btn_step_down_clicked(self):
         self.step_view.scroll_down()
-
 
     def on_beverage_selected(self, beverage: 'Beverage'):
         self.selected_beverage = beverage
