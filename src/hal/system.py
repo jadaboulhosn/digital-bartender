@@ -1,12 +1,22 @@
 import logging
+import asyncio
 
+from frontend.settings import Settings
 from shared.singleton import Singleton
 from hal.pump import Pump
+from backend.barista import Beverages
+from backend.bar import Recipe, Beverage
 
 @Singleton
 class System():
     def __init__(self):
-        self.data = []
+        self.data = [] 
+        self.pour_progress = 0
+        self.is_pouring = False
+        self.timer = None
+        
+        self.loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(self.loop)
     
     def attach(self, name: str, vcc_pin: int, gnd_pin: int) -> Pump:
         pump = Pump(name, vcc_pin, gnd_pin)
@@ -28,6 +38,96 @@ class System():
     def clear(self):
         self.data = []
 
+    def validate_pumps(self):
+        for pump in self.data:
+            has_match = False
+            for beverage in Beverages.instance():
+                if pump.id != -1 and pump.id == hash(beverage):
+                     has_match = True
+            if not has_match:
+                pump.id = -1
+
+    def get_pump_ids(self) -> list:
+        ids = []
+        for pump in self.data:
+            if pump.id != -1:
+                ids.append(pump.id)
+        return ids
+    
+    def can_pour(self, recipe: 'Recipe') -> bool:
+        self.validate_pumps()
+
+        ids = self.get_pump_ids()
+        for step in recipe.steps:
+            if hash(step.beverage) not in ids:
+                return False
+        return True
+
+    def get_missing(self, recipe: 'Recipe') -> list:
+        self.validate_pumps()
+
+        missing = []
+        ids = self.get_pump_ids()
+        for step in recipe.steps:
+            if hash(step.beverage) not in ids:
+                missing.append(hash(step.beverage))
+        
+        beverages = []
+        for id in missing:
+            for beverage in Beverages.instance():
+                if hash(beverage) == id:
+                    beverages.append(beverage)
+                    break
+        return beverages          
+
+    def pour(self, recipe: 'Recipe', callback) -> bool:
+        timing = {}
+        if self.can_pour(recipe) and not self.is_pouring:
+            self.pour_progress = 0
+
+            logging.info(f"Pouring {recipe} now ({recipe.volume()} mL)")
+            for step in recipe.steps:                
+                found = False
+                for pump in self.data:
+                    if pump.id == hash(step.beverage):
+                        duration = float(step.volume) / float(Settings.instance().mls_per_second)
+                        logging.info(f"Pouring {step.beverage} ({step.volume()} mL, {round(duration, 2)} seconds)")
+                        found = True
+
+                        timing[pump] = duration
+                        pump.activate()
+                        
+                        break       
+                if not found:
+                    logging.error(f"Unable to locate one or more ingredients despite check!")         
+                    self.abort()
+                    return False
+            
+            self.is_pouring = True
+            self.timer = PumpTimer(0.05, timing, self.on_progress_updated, lambda: [self.on_pour_complete(), callback()])
+            return True
+        elif self.is_pouring:
+            logging.error(f"Unable to pour {recipe} because a pour is already in progress!")
+        else:
+            logging.error(f"Unable to pour {recipe} due to missing ingredients!")
+        return False
+
+    def on_progress_updated(self, progress: float):
+        self.progress = progress
+
+    def on_pour_complete(self):
+        self.progress = 0
+        self.is_pouring = False
+        self.timer = None
+
+    def abort(self):
+        logging.warning("Aborting all pump activities now!")
+        self.timer.cancel()
+        for pump in self.data:
+            if pump.is_active():
+                logging.warning(f"\tDeactivating {pump}.")
+                pump.deactivate()
+
     def __iter__(self):
         return iter(self.data)
     
@@ -48,3 +148,52 @@ class System():
  
     def __len__(self) -> int:
         return len(self.data)
+    
+class PumpTimer:
+    def __init__(self, interval, data, progress_callback, completion_callback):
+        self.interval = interval
+        self.completion_callback = completion_callback
+        self.progress_callback = progress_callback
+        self.data = data
+        self.running = True
+        self.task = asyncio.ensure_future(self._job())
+        
+        self.total_time = 0
+        for value in self.data.values():
+            self.total_time = max(self.total_time, value)
+
+        self.time = 0
+
+        logging.info(f"Starting async event loop to track pumps with {len(data)} tasks.")
+
+    async def job(self):
+        try:
+            while self.running:
+                await asyncio.sleep(self.interval)
+                
+                completed_pumps = []
+                for key in self.data.keys():
+                    self.data[key] -= self.interval
+                    if self.data[key] <= 0:                    
+                        completed_pumps.append(key)
+                
+                for pump in completed_pumps:
+                    logging.info(f"\t{pump} is complete.")
+                    pump.deactivate()
+                    del self.data[pump]
+
+                if len(self.data) == 0:
+                    self.running = False   
+
+                self.time += self.interval
+                self.progress_callback(self.time / self.total_time)
+                if self.time >= self.total_time:
+                    logging.info(f"Pour task is now complete ({round(self.time, 2)} seconds)!")
+                    self.cancel()
+            self.completion_callback()
+        except Exception as ex:
+            print(ex)
+
+    def cancel(self):
+        self.running = False
+        self.task.cancel()
