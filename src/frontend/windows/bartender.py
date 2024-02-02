@@ -1,4 +1,5 @@
 import random
+import logging
 
 import customtkinter as ctk
 
@@ -39,16 +40,20 @@ class BartenderFrame(WindowFrame):
         self.frm_pour.grid()
         self.frm_pour.tkraise()
 
+        logging.info(f"User initiated a pour of {recipe} ({recipe.volume()} mL).")
         self.frm_pour.update(random.choice(self.phrases).replace("$", recipe.name), 0)
         self.after(50, self.update_pour_status)
-        System.instance().pour(recipe)
+        System.instance().pour(recipe, self.on_pour_complete)
+        self.master.toolbar.disable()
     
     def update_pour_status(self):
-        self.frm_pour.update(progress=System.instance().pour_progress)
+        self.frm_pour.update(progress=System.instance().progress)
         self.after(50, self.update_pour_status)
 
-        if System.instance().pour_progress > 0.99:
-            self.show_display_frame()
+    def on_pour_complete(self):
+        logging.info("Pour is complete!")
+        self.master.toolbar.enable()
+        self.show_display_frame()
 
     def show_display_frame(self):
         self.frm_pour.grid_remove()
@@ -57,6 +62,10 @@ class BartenderFrame(WindowFrame):
         self.frm_display.tkraise()
     
     def on_pour_abort(self):
+        logging.warning("User aborted pour!")
+
+        System.instance().abort()
+        self.master.toolbar.enable()
         self.show_display_frame()
 
 class PourFrame(ctk.CTkFrame):

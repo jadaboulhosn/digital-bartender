@@ -11,7 +11,7 @@ from backend.bar import Recipe, Beverage
 class System():
     def __init__(self):
         self.data = [] 
-        self.pour_progress = 0
+        self.progress = 0
         self.is_pouring = False
         self.timer = None
         
@@ -83,7 +83,7 @@ class System():
     def pour(self, recipe: 'Recipe', callback) -> bool:
         timing = {}
         if self.can_pour(recipe) and not self.is_pouring:
-            self.pour_progress = 0
+            self.progress = 0
 
             logging.info(f"Pouring {recipe} now ({recipe.volume()} mL)")
             for step in recipe.steps:                

@@ -101,7 +101,14 @@ class ScrollableFrame(ctk.CTkScrollableFrame):
                 self.callback(self.selected_obj)
             else:
                 list_label.set_selected(False)
-                
+    
+    def select_item(self, text):
+        for list_label, _ in self.scrollview_objs.items():
+            if text == list_label._text:
+                list_label.set_selected(True)
+            else:
+                list_label.set_selected(False)
+
     def append(self, text, obj):
         self.rowconfigure(len(self.scrollview_objs), weight=0)
         label = ToggleListButton(

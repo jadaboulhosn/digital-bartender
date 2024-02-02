@@ -101,6 +101,6 @@ class Pump(Entity):
 
     def is_active(self) -> bool:
         return self.active and self.is_setup
-
+    
     def __str__(self) -> str:
         return f"{self.name}: VCC@{Pins.instance().get_pin_name(self.vcc_pin)} GND@{Pins.instance().get_pin_name(self.gnd_pin)}"

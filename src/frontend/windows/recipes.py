@@ -26,21 +26,19 @@ class RecipesFrame(WindowFrame):
             master = self, 
             text = "←", 
             command = self.btn_left_clicked, 
-            fg_color = Colors.BUTTON_GRAY,
-            corner_radius=8
+            fg_color = Colors.BUTTON_GRAY
             )
         self.btn_left.grid(row=1, column=0, sticky='w')
-        self.btn_left.configure(True, width=128, height=128)
+        self.btn_left.configure(True, width=128, height=128, corner_radius=8)
 
         self.btn_right = Button(
             master = self, 
             text = "→", 
             command = self.btn_right_clicked, 
-            fg_color = Colors.BUTTON_GRAY,
-            corner_radius=8
+            fg_color = Colors.BUTTON_GRAY
             )
         self.btn_right.grid(row=1, column=2, sticky='e')
-        self.btn_right.configure(True, width=128, height=128)
+        self.btn_right.configure(True, width=128, height=128, corner_radius=8)
 
         self.selected_type = None
         self.selected_beverage = None

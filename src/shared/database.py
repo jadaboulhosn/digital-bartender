@@ -75,7 +75,7 @@ class Database(object):
 
             return True
         except Exception as e:
-            logging.critical(f"Unable to read archival data:\n\t{e}")
+            logging.critical(f"Unable to read archival data:\n\t{e}", exc_info=True)
             return False
     
     def save(self):
@@ -101,7 +101,7 @@ class Database(object):
                         logging.info(f"Detected change. Writing {len(datum.reference.data)} objects to {datum.path}.")
             return True
         except Exception as e:
-            logging.critical("Unable to write archival data:\n\t{e}")
+            logging.critical(f"Unable to write archival data:\n\t{e}", exc_info=True)
             return False
         
     def destroy(self):

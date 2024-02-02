@@ -34,8 +34,8 @@ class App(ctk.CTk):
         self.geometry('%dx%d+%d+%d' % (Settings.instance().width, Settings.instance().height, x, y))
         self.minsize(Settings.instance().width, Settings.instance().height)
 
-        self.rowconfigure(0, weight=8)
-        self.rowconfigure(1, weight=2)
+        self.rowconfigure(0, weight=6)
+        self.rowconfigure(1, weight=6)
         self.columnconfigure(0, weight=1)
 
         self.resizable(False, False)
@@ -52,7 +52,7 @@ class App(ctk.CTk):
         self.toolbar = ToolbarFrame(
             windows=self.windows, 
             state_changed=self.toolbar_changed, 
-            default=1, 
+            default=0, 
             master=self
             )
         self.toolbar.grid(row=1, column=0, sticky='nsew', pady=(0, 0))
