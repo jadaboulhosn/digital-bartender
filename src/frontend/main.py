@@ -3,6 +3,7 @@ import sys
 sys.path.insert(0, './')
 import customtkinter as ctk
 import logging
+import asyncio
 
 from frontend.components import ToolbarFrame, PopupFrame
 from frontend.windows.input import InputFrame
@@ -18,10 +19,15 @@ from shared.database import Database
 from backend.util import get_hostname
 
 class App(ctk.CTk):
-    def __init__(self):
+    def __init__(self, loop, interval=1/120):
         super().__init__()
         #self.withdraw()
-    
+
+        self.loop = loop
+        self.protocol("WM_DELETE_WINDOW", self.close)
+        self.tasks = []
+        self.tasks.append(loop.create_task(self.updater(interval)))
+
         self.register_fonts()
         self.database = Database()
         self.database.load()
@@ -71,6 +77,17 @@ class App(ctk.CTk):
 
         self.wm_title("digitender")
         #self.deiconify()
+
+    async def updater(self, interval):
+        while True:
+            self.update()
+            await asyncio.sleep(interval)
+
+    def close(self):
+        for task in self.tasks:
+            task.cancel()
+        self.loop.stop()
+        self.destroy()
 
     def save(self):
         self.database.save()
@@ -143,5 +160,7 @@ if __name__ == "__main__":
 
     ctk.set_appearance_mode('dark')
 
-    app = App()
-    app.mainloop()
+    loop = asyncio.get_event_loop()
+    app = App(loop)
+    loop.run_forever()
+    loop.close()

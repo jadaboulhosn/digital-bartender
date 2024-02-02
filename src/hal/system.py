@@ -15,8 +15,7 @@ class System():
         self.is_pouring = False
         self.timer = None
         
-        self.loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(self.loop)
+        self.loop = asyncio.get_event_loop()
     
     def attach(self, name: str, vcc_pin: int, gnd_pin: int) -> Pump:
         pump = Pump(name, vcc_pin, gnd_pin)
@@ -81,8 +80,8 @@ class System():
         return beverages          
 
     def pour(self, recipe: 'Recipe', callback) -> bool:
-        timing = {}
         if self.can_pour(recipe) and not self.is_pouring:
+            timing = []
             self.progress = 0
 
             logging.info(f"Pouring {recipe} now ({recipe.volume()} mL)")
@@ -94,7 +93,7 @@ class System():
                         logging.info(f"Pouring {step.beverage} ({step.volume} mL, {round(duration, 2)} seconds)")
                         found = True
 
-                        timing[pump] = duration
+                        timing.append(PumpData(pump, duration))
                         pump.activate()
                         
                         break       
@@ -102,7 +101,6 @@ class System():
                     logging.error(f"Unable to locate one or more ingredients despite check!")         
                     self.abort()
                     return False
-            
             self.is_pouring = True
             self.timer = PumpTimer(0.05, timing, self.on_progress_updated, lambda: [self.on_pour_complete(), callback()])
             return True
@@ -149,6 +147,11 @@ class System():
     def __len__(self) -> int:
         return len(self.data)
     
+class PumpData:
+    def __init__(self, pump: 'Pump', duration: float):
+        self.pump = pump
+        self.duration = duration
+
 class PumpTimer:
     def __init__(self, interval, data, progress_callback, completion_callback):
         self.interval = interval
@@ -159,12 +162,12 @@ class PumpTimer:
         self.task = asyncio.ensure_future(self.job())
         
         self.total_time = 0
-        for value in self.data.values():
-            self.total_time = max(self.total_time, value)
+        for data in self.data:
+            self.total_time = max(self.total_time, data.duration)
 
         self.time = 0
 
-        logging.info(f"Starting async event loop to track pumps with {len(data)} tasks.")
+        logging.info(f"Starting async event loop to track pumps with {len(self.data)} tasks.")
 
     async def job(self):
         try:
@@ -172,15 +175,15 @@ class PumpTimer:
                 await asyncio.sleep(self.interval)
                 
                 completed_pumps = []
-                for key in self.data.keys():
-                    self.data[key] -= self.interval
-                    if self.data[key] <= 0:                    
-                        completed_pumps.append(key)
+                for data in self.data:
+                    data.duration -= self.interval
+                    if data.duration <= 0:                    
+                        completed_pumps.append(data)
                 
-                for pump in completed_pumps:
-                    pump.deactivate()
-                    del self.data[pump]
-                    logging.info(f"\t{pump} is complete. There are {len(self.data)} tasks remaining.")
+                for data in completed_pumps:
+                    data.pump.deactivate()
+                    self.data.remove(data)
+                    logging.info(f"\t{data.pump} is complete. There are {len(self.data)} tasks remaining.")
 
                 if len(self.data) == 0:
                     self.running = False   
@@ -192,7 +195,7 @@ class PumpTimer:
                     self.cancel()
             self.completion_callback()
         except Exception as ex:
-            print(ex)
+            logging.critical(ex, exc_info=True)
 
     def cancel(self):
         self.running = False
