@@ -40,6 +40,10 @@ class Database(object):
                     with open(datum.path, 'r') as file:
                         datum.reference.data = jsonpickle.decode(file.read())
 
+                    if isinstance(datum.reference, System):
+                        for pump in System.instance().data:
+                            pump.active = False
+
                     if isinstance(datum.reference, Types) or isinstance(datum.reference, Beverages) or isinstance(datum.reference, Recipes):
                         logging.info(f"Successfully read {datum.path}. Restoring object references...")
 

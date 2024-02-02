@@ -67,6 +67,9 @@ class BartenderFrame(WindowFrame):
         System.instance().abort()
         self.master.toolbar.enable()
         self.show_display_frame()
+    
+    def update(self):
+        self.frm_display.frm_summary.load(self.frm_display.recipe_index)
 
 class PourFrame(ctk.CTkFrame):
     def __init__(self, *args, **kwargs):

@@ -91,7 +91,7 @@ class System():
                 for pump in self.data:
                     if pump.id == hash(step.beverage):
                         duration = float(step.volume) / float(Settings.instance().mls_per_second)
-                        logging.info(f"Pouring {step.beverage} ({step.volume()} mL, {round(duration, 2)} seconds)")
+                        logging.info(f"Pouring {step.beverage} ({step.volume} mL, {round(duration, 2)} seconds)")
                         found = True
 
                         timing[pump] = duration
@@ -156,7 +156,7 @@ class PumpTimer:
         self.progress_callback = progress_callback
         self.data = data
         self.running = True
-        self.task = asyncio.ensure_future(self._job())
+        self.task = asyncio.ensure_future(self.job())
         
         self.total_time = 0
         for value in self.data.values():
@@ -178,9 +178,9 @@ class PumpTimer:
                         completed_pumps.append(key)
                 
                 for pump in completed_pumps:
-                    logging.info(f"\t{pump} is complete.")
                     pump.deactivate()
                     del self.data[pump]
+                    logging.info(f"\t{pump} is complete. There are {len(self.data)} tasks remaining.")
 
                 if len(self.data) == 0:
                     self.running = False   

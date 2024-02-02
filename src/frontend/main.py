@@ -52,7 +52,7 @@ class App(ctk.CTk):
         self.toolbar = ToolbarFrame(
             windows=self.windows, 
             state_changed=self.toolbar_changed, 
-            default=0, 
+            default=1, 
             master=self
             )
         self.toolbar.grid(row=1, column=0, sticky='nsew', pady=(0, 0))
@@ -127,6 +127,9 @@ class App(ctk.CTk):
         
     def toolbar_changed(self, window):
         window.tkraise()
+        
+        if isinstance(window, BartenderFrame):
+            window.update()
 
 if __name__ == "__main__":
     if get_hostname() == "digitender":
