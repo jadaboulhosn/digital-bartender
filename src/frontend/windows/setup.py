@@ -54,10 +54,10 @@ class SetupFrame(WindowFrame):
             index += 1
     
     def scroll_left(self):
-        self.scrollarea._parent_canvas.xview("scroll", -50, "units")
+        self.scrollarea._parent_canvas.xview("scroll", -200, "units")
 
     def scroll_right(self):
-        self.scrollarea._parent_canvas.xview("scroll", 50, "units")
+        self.scrollarea._parent_canvas.xview("scroll", 200, "units")
 
 class PumpFrame(ctk.CTkFrame):
     def __init__(self, pump: 'Pump', **kwargs):
@@ -98,7 +98,7 @@ class PumpFrame(ctk.CTkFrame):
 
         self.btn_pour = ctk.CTkButton(
             self, 
-            text="Pour", 
+            text="Purge", 
             font=Fonts.instance().get("title"), 
             fg_color=Colors.BUTTON_GREEN,
             corner_radius=0,

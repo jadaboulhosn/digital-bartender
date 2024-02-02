@@ -271,7 +271,7 @@ class RecipeFrame(ctk.CTkFrame):
         self.scrollview.clear()
 
         for recipe in Recipes.instance():
-            self.scrollview.append(f"{recipe.name} ({len(recipe.steps)} Steps)", recipe)
+            self.scrollview.append(f"{recipe.name} ({recipe.volume()} mL)", recipe)
             
     def btn_up_clicked(self):
         self.scrollview.scroll_up()
