@@ -14,6 +14,7 @@ from frontend.windows.bartender import BartenderFrame
 from frontend.windows.recipes import RecipesFrame
 from frontend.windows.setup import SetupFrame
 
+from shared.updater import Updater
 from shared.database import Database
 
 from backend.util import get_hostname
@@ -78,6 +79,8 @@ class App(ctk.CTk):
         self.wm_title("digitender")
         #self.deiconify()
 
+        self.check_updates()
+
     async def updater(self, interval):
         while True:
             self.update()
@@ -88,6 +91,9 @@ class App(ctk.CTk):
             task.cancel()
         self.loop.stop()
         self.destroy()
+
+    def check_updates(self):
+        self.after(5000, Updater.instance().check_for_updates())
 
     def save(self):
         self.database.save()
