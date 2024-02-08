@@ -94,8 +94,6 @@ class System():
                         found = True
 
                         timing.append(PumpData(pump, duration))
-                        pump.activate()
-                        
                         break       
                 if not found:
                     logging.error(f"Unable to locate one or more ingredients despite check!")         
@@ -163,7 +161,7 @@ class PumpTimer:
         
         self.total_time = 0
         for data in self.data:
-            self.total_time = max(self.total_time, data.duration)
+            self.total_time += data.duration
 
         self.time = 0
 
@@ -174,23 +172,21 @@ class PumpTimer:
             while self.running:
                 await asyncio.sleep(self.interval)
                 
-                completed_pumps = []
-                for data in self.data:
+                if len(self.data) > 0:
+                    data = self.data[0]
+                    if not data.pump.active:
+                        logging.info(f"Activating {data.pump} for {data.duration}s...")
+                        data.pump.activate()
                     data.duration -= self.interval
-                    if data.duration <= 0:                    
-                        completed_pumps.append(data)
-                
-                for data in completed_pumps:
-                    data.pump.deactivate()
-                    self.data.remove(data)
-                    logging.info(f"\t{data.pump} is complete. There are {len(self.data)} tasks remaining.")
-
-                if len(self.data) == 0:
+                    if data.duration <= 0:  
+                        self.data.remove(data)
+                        logging.info(f"\t{data.pump} is complete. There are {len(self.data)} tasks remaining.")                  
+                else:
                     self.running = False   
 
                 self.time += self.interval
                 self.progress_callback(self.time / self.total_time)
-                if self.time >= self.total_time:
+                if len(self.data) == 0:
                     logging.info(f"Pour task is now complete ({round(self.time, 2)} seconds)!")
                     self.cancel()
             self.completion_callback()
