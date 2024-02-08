@@ -152,7 +152,19 @@ class PumpFrame(ctk.CTkFrame):
     def on_pour_clicked(self):
         self.btn_abort.grid()
         self.btn_pour.grid_remove()
+        
+        self.pump.activate()
+        self.master.master.toolbar.disable()
 
     def on_abort_clicked(self):
         self.btn_pour.grid()
         self.btn_abort.grid_remove()
+
+        self.pump.deactivate()
+        pump_active = False
+        for pump in System.instance().data:
+            if pump.active:
+                pump_active = True
+                break
+        if not pump_active:
+            self.master.master.toolbar.enable()
