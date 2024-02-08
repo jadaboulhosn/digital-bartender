@@ -1,5 +1,6 @@
 import subprocess
 import logging
+import os
 
 from hal.system import System
 from shared.singleton import Singleton
@@ -27,5 +28,6 @@ class Updater:
                 subprocess.check_output(['git', 'pull'])
                 
                 logging.info("Update downloaded... restarting!")
-                subprocess.Popen(["../run.sh"], start_new_session=True)
+                os.chdir('../')
+                subprocess.Popen(["./run.sh"], start_new_session=True)
                 exit()
