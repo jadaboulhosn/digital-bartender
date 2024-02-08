@@ -102,7 +102,8 @@ class App(ctk.CTk):
         self.destroy()
 
     def check_updates(self):
-        self.after(5000, Updater.instance().check_for_updates())
+        Updater.instance().check_for_updates()
+        self.after(5000, self.check_updates)
 
     def save(self):
         self.database.save()

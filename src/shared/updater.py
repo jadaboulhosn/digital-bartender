@@ -20,11 +20,12 @@ class Updater:
         return True
 
     def check_for_updates(self):
-        subprocess.check_output(['git', 'fetch'])
-        if "up to date" not in subprocess.check_output(['git', 'status']).decode("utf-8").replace("\n", "").strip() and self.can_update():
-            logging.info("Update was detected in git. Retreiving...")
-            subprocess.check_output(['git', 'pull'])
-            
-            logging.info("Update downloaded... restarting!")
-            subprocess.Popen(["python3", "../main.py"], start_new_session=True)
-            exit()
+        if self.can_update():
+            subprocess.check_output(['git', 'fetch'])
+            if "up to date" not in subprocess.check_output(['git', 'status']).decode("utf-8").replace("\n", "").strip():
+                logging.info("Update was detected in git. Retreiving...")
+                subprocess.check_output(['git', 'pull'])
+                
+                logging.info("Update downloaded... restarting!")
+                subprocess.Popen(["python3", "../main.py"], start_new_session=True)
+                exit()
