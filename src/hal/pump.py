@@ -13,28 +13,22 @@ from hal.pins import Pins
 from shared.entity import Entity
 
 class Pump(Entity):
-    def __init__(self, name = "", vcc_pin = -1, gnd_pin = -1):
+    def __init__(self, name = "", pin = -1):
         self.name = name
         self.id = -1
-        self.vcc_pin = vcc_pin
-        self.gnd_pin = gnd_pin
+        self.pin = pin
         self.is_setup = False
         self.active = False
 
-        self.set_pin_number(vcc_pin, gnd_pin)
+        self.set_pin_number(pin)
     
     def setup(self):
         if not self.is_setup:
             GPIO.setmode(GPIO.BOARD)
-            if Pins.instance().is_pin_permitted(pin_number = self.vcc_pin):
-                if Pins.instance().is_pin_permitted(pin_number = self.gnd_pin):
-                    GPIO.setup(self.gnd_pin, GPIO.OUT)
-                    GPIO.setup(self.vcc_pin, GPIO.OUT)
-                    self.is_setup = True
-                    logging.info(f"{self} is now ready.")
-                else:
-                    self.is_setup = False
-                    logging.error(f"Unable to setup {self} because the GND pin number is invalid!")
+            if Pins.instance().is_pin_permitted(pin_number = self.pin):
+                GPIO.setup(self.pin, GPIO.OUT)
+                self.is_setup = True
+                logging.info(f"{self} is now ready.")
             else:
                 self.is_setup = False
                 logging.error(f"Unable to setup {self} because the VCC pin number is invalid!")
@@ -53,8 +47,7 @@ class Pump(Entity):
         if self.is_setup:
             if not self.active:
                 logging.info(f"Activating {self}.")
-                GPIO.output(self.vcc_pin, GPIO.HIGH)
-                GPIO.output(self.gnd_pin, GPIO.LOW)
+                GPIO.output(self.pin, GPIO.HIGH)
                 self.active = True
 
                 return True
@@ -69,8 +62,7 @@ class Pump(Entity):
         if self.is_setup:
             if self.active:
                 logging.info(f"Deactivating {self}.")
-                GPIO.output(self.vcc_pin, GPIO.LOW)
-                GPIO.output(self.gnd_pin, GPIO.LOW)
+                GPIO.output(self.pin, GPIO.LOW)
                 self.active = False
 
                 return True
@@ -81,22 +73,16 @@ class Pump(Entity):
             
         return False
 
-    def set_pin_number(self, vcc_pin, gnd_pin):
-        if Pins.instance().is_pin_permitted(pin_number = vcc_pin):
-            if Pins.instance().is_pin_permitted(pin_number = gnd_pin):
-                logging.info(f"Setting {self.name} to \
-                    VCC@{Pins.instance().get_pin_name(vcc_pin)} and \
-                    GND@{Pins.instance().get_pin_name(vcc_pin)}")
-                if self.is_setup:
-                    self.teardown()
+    def set_pin_number(self, pin):
+        if Pins.instance().is_pin_permitted(pin_number = pin):
+            logging.info(f"Setting {self.name} to VCC@{Pins.instance().get_pin_name(pin)}")
+            if self.is_setup:
+                self.teardown()
 
-                self.vcc_pin = vcc_pin
-                self.gnd_pin = gnd_pin
-                self.setup()
-            else:
-                 logging.error(f"Unable to set GND@{self.name} to {vcc_pin} because the pin number is invalid.")      
+            self.pin = pin
+            self.setup()    
         else:
-            logging.error(f"Unable to set VCC@{self.name} to {vcc_pin} because the pin number is invalid.")        
+            logging.error(f"Unable to set VCC@{self.name} to {pin} because the pin number is invalid.")        
 
     def is_valid(self) -> bool:
         return self.is_setup
@@ -105,4 +91,4 @@ class Pump(Entity):
         return self.active and self.is_setup
     
     def __str__(self) -> str:
-        return f"{self.name}: VCC@{Pins.instance().get_pin_name(self.vcc_pin)} GND@{Pins.instance().get_pin_name(self.gnd_pin)}"
+        return f"{self.name}: VCC@{Pins.instance().get_pin_name(self.pin)}"

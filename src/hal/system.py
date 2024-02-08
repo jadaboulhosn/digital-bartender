@@ -17,8 +17,8 @@ class System():
         
         self.loop = asyncio.get_event_loop()
     
-    def attach(self, name: str, vcc_pin: int, gnd_pin: int) -> Pump:
-        pump = Pump(name, vcc_pin, gnd_pin)
+    def attach(self, name: str, pin: int) -> Pump:
+        pump = Pump(name, pin)
         
         logging.info(f"Adding {pump} to System.")
         self.data.append(pump)
