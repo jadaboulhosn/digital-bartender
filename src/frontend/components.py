@@ -185,10 +185,10 @@ class ToggleToolbarButton(Button):
         self.configure(True, fg_color=self.default_color)
 
     def enable(self):
-        self.configure(False, state = 'normal')
+        self.configure(True, state = 'normal')
     
     def disable(self):
-        self.configure(False, state = 'disabled')
+        self.configure(True, state = 'disabled')
 
 class UpDownFrame(ctk.CTkFrame):
     def __init__(self, on_up, on_down, **kwargs):
@@ -260,6 +260,8 @@ class ToolbarFrame(ctk.CTkFrame):
     def __init__(self, windows: list, state_changed, default: int = 0, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
+        self.state = True
+
         self.grid_rowconfigure(0, weight=1)
 
         def state_click(target_window):
@@ -285,12 +287,16 @@ class ToolbarFrame(ctk.CTkFrame):
         self.buttons[self.windows[default]].invoke()
 
     def enable(self):
-        for _, button in self.buttons.items():
-            button.enable()
+        if not self.state:
+            for _, button in self.buttons.items():
+                button.enable()
+            self.state = True
 
     def disable(self):
-        for _, button in self.buttons.items():
-            button.disable()
+        if self.state:
+            for _, button in self.buttons.items():
+                button.disable()
+            self.state = False
 
     def get_state(self) -> str:
         return self.window

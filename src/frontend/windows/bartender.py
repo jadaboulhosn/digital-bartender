@@ -44,7 +44,6 @@ class BartenderFrame(WindowFrame):
         self.frm_pour.update(random.choice(self.phrases).replace("$", recipe.name), 0)
         self.after(50, self.update_pour_status)
         System.instance().pour(recipe, self.on_pour_complete)
-        self.master.toolbar.disable()
     
     def update_pour_status(self):
         self.frm_pour.update(progress=System.instance().progress)
@@ -52,7 +51,6 @@ class BartenderFrame(WindowFrame):
 
     def on_pour_complete(self):
         logging.info("Pour is complete!")
-        self.master.toolbar.enable()
         self.show_display_frame()
 
     def show_display_frame(self):
@@ -65,7 +63,6 @@ class BartenderFrame(WindowFrame):
         logging.warning("User aborted pour!")
 
         System.instance().abort()
-        self.master.toolbar.enable()
         self.show_display_frame()
     
     def update(self):

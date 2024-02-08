@@ -6,6 +6,8 @@ import logging
 import asyncio
 import signal
 
+from hal.system import System
+
 from frontend.components import ToolbarFrame, PopupFrame
 from frontend.windows.input import InputFrame
 from frontend.settings import Settings
@@ -84,6 +86,7 @@ class App(ctk.CTk):
         #self.deiconify()
 
         self.check_updates()
+        self.check_pump_state()
 
         signal.signal(signal.SIGINT, lambda x, y: self.destroy())
         tk_check = lambda: self.after(500, tk_check)
@@ -100,6 +103,19 @@ class App(ctk.CTk):
             task.cancel()
         self.loop.stop()
         self.destroy()
+
+    def check_pump_state(self):
+        pump_active = False
+        for pump in System.instance():
+            if pump.active:
+                pump_active = True
+                break
+        if pump_active:
+            self.toolbar.disable()
+        else:
+            self.toolbar.enable()
+
+        self.after(100, self.check_pump_state)
 
     def check_updates(self):
         Updater.instance().check_for_updates()
