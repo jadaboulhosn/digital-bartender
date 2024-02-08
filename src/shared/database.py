@@ -43,6 +43,8 @@ class Database(object):
                     if isinstance(datum.reference, System):
                         for pump in System.instance().data:
                             pump.active = False
+                            pump.is_setup = False
+                            pump.setup()
 
                     if isinstance(datum.reference, Types) or isinstance(datum.reference, Beverages) or isinstance(datum.reference, Recipes):
                         logging.info(f"Successfully read {datum.path}. Restoring object references...")
