@@ -4,6 +4,7 @@ sys.path.insert(0, './')
 import customtkinter as ctk
 import logging
 import asyncio
+import signal
 
 from frontend.components import ToolbarFrame, PopupFrame
 from frontend.windows.input import InputFrame
@@ -36,7 +37,7 @@ class App(ctk.CTk):
 
         if get_hostname() == "barntender":
             self.overrideredirect(True)
-            
+
         screen_width = self.winfo_screenwidth()
         screen_height = self.winfo_screenheight()
         x = (screen_width / 2) - (Settings.instance().width / 2)
@@ -83,6 +84,11 @@ class App(ctk.CTk):
         #self.deiconify()
 
         self.check_updates()
+
+        signal.signal(signal.SIGINT, lambda x, y: self.destroy())
+        tk_check = lambda: self.after(500, tk_check)
+        self.after(500, tk_check)
+        self.bind_all("<Control-c>", lambda e: self.destroy())
 
     async def updater(self, interval):
         while True:
