@@ -34,6 +34,9 @@ class App(ctk.CTk):
         self.database.load()
         self.save()
 
+        if get_hostname() == "barntender":
+            self.overrideredirect(True)
+            
         screen_width = self.winfo_screenwidth()
         screen_height = self.winfo_screenheight()
         x = (screen_width / 2) - (Settings.instance().width / 2)
