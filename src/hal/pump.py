@@ -21,8 +21,8 @@ class Pump(Entity):
         self.is_setup = False
         self.active = False
 
-        self.set_pin_number(vcc_pin, gnd_pin)
         GPIO.setmode(GPIO.BOARD)
+        self.set_pin_number(vcc_pin, gnd_pin)
     
     def setup(self):
         if not self.is_setup:
