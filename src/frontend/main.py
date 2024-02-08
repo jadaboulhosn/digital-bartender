@@ -2,7 +2,13 @@ import os
 import sys
 sys.path.insert(0, './')
 import customtkinter as ctk
+
+# Set logging level as early as possible.
 import logging
+logging.basicConfig()
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
 import asyncio
 import signal
 
@@ -185,10 +191,6 @@ if __name__ == "__main__":
         os.environ["DISPLAY"] = ':0' 
     else:
         os.environ["DISPLAY"] = ''
-
-    logging.basicConfig()
-    logger = logging.getLogger()
-    logger.setLevel(logging.INFO)
 
     ctk.set_appearance_mode('dark')
 
