@@ -27,5 +27,5 @@ class Updater:
                 subprocess.check_output(['git', 'pull'])
                 
                 logging.info("Update downloaded... restarting!")
-                subprocess.Popen(["python3", "../main.py"], start_new_session=True)
+                subprocess.Popen(["./run.sh"], start_new_session=True)
                 exit()
