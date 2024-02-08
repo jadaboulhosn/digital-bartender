@@ -11,7 +11,7 @@ class Updater:
         pass
 
     def can_update(self):
-        if get_hostname() != 'digitender':
+        if get_hostname() != 'barntender':
             return False
         
         for pump in System.instance():

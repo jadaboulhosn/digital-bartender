@@ -76,7 +76,7 @@ class App(ctk.CTk):
         self.numberpad.grid(row=0, column=0, rowspan=2, sticky='nsew')
         self.hide_keyboard(use_numeric=True)
 
-        self.wm_title("digitender")
+        self.wm_title("barntender")
         #self.deiconify()
 
         self.check_updates()
@@ -155,7 +155,7 @@ class App(ctk.CTk):
             window.update()
 
 if __name__ == "__main__":
-    if get_hostname() == "digitender":
+    if get_hostname() == "barntender":
         os.environ["DISPLAY"] = ':0' 
     else:
         os.environ["DISPLAY"] = ''
