@@ -64,7 +64,8 @@ class Button(ctk.CTkButton):
             True, 
             font=Fonts.instance().get("button"),
             corner_radius=0,
-            border_width=0
+            border_width=0,
+            hover_color=self._fg_color
             )
 
 class ScrollableFrame(ctk.CTkScrollableFrame):
@@ -163,9 +164,9 @@ class ToggleListButton(ctk.CTkButton):
 
     def set_selected(self, state):
         if state:
-            self.configure(True, fg_color=self.active_color)
+            self.configure(True, fg_color=self.active_color, hover_color=self.active_color)
         else:
-            self.configure(True, fg_color=self.inactive_color)
+            self.configure(True, fg_color=self.inactive_color, hover_color=self.inactive_color)
 
 class ToggleToolbarButton(Button):
     def __init__(self, **kwargs):
