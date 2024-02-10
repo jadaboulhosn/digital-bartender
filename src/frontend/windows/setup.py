@@ -54,10 +54,10 @@ class SetupFrame(WindowFrame):
             index += 1
     
     def scroll_left(self):
-        self.scrollarea._parent_canvas.xview("scroll", -10, "units")
+        self.scrollarea._parent_canvas.xview("scroll", -5, "units")
 
     def scroll_right(self):
-        self.scrollarea._parent_canvas.xview("scroll", 10, "units")
+        self.scrollarea._parent_canvas.xview("scroll", 5, "units")
 
 class PumpFrame(ctk.CTkFrame):
     def __init__(self, pump: 'Pump', **kwargs):
