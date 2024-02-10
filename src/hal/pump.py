@@ -48,7 +48,7 @@ class Pump(Entity):
         if self.is_setup:
             if not self.active:
                 logging.info(f"Activating {self}.")
-                GPIO.output(self.pin, GPIO.HIGH)
+                GPIO.output(self.pin, GPIO.LOW)
                 self.active = True
 
                 return True
@@ -63,7 +63,7 @@ class Pump(Entity):
         if self.is_setup:
             if self.active:
                 logging.info(f"Deactivating {self}.")
-                GPIO.output(self.pin, GPIO.LOW)
+                GPIO.output(self.pin, GPIO.HIGH)
                 self.active = False
 
                 return True
