@@ -27,8 +27,8 @@ class Pump(Entity):
             GPIO.setmode(GPIO.BOARD)
             if Pins.instance().is_pin_permitted(pin_number = self.pin):
                 GPIO.setup(self.pin, GPIO.OUT)
+                GPIO.output(self.pin, GPIO.HIGH)
                 self.is_setup = True
-                self.deactivate()
                 logging.info(f"{self} is now ready.")
             else:
                 self.is_setup = False
